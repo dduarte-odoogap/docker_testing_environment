@@ -1,0 +1,7 @@
+docker run \
+    --env-file .env \
+    --network net1 \
+    --rm -i -t \
+    --name shell \
+    odoogap/odoo_shell \
+    odoo shell -d odoo --no-http
