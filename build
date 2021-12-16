@@ -1,6 +1,3 @@
 #!/bin/bash
 
-docker-compose up odoo13
-#docker exec -it odoo14_app odoo --no-http --stop-after-init -u all
-echo "----------------------------------------------------------------------"
-docker exec -it odoo13_app odoo --no-http --stop-after-init -u all
+docker-compose up -d --build

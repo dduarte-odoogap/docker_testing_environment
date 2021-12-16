@@ -1,28 +1,26 @@
-x-odoo-build: &odoo14-build
+version: "3.7"
+
+x-odoo-build: &odoo-build
   context: ./14.0
   dockerfile: Dockerfile
 
-x-odoo-build: &odoo13-build
-  context: ./13.0
-  dockerfile: Dockerfile
 
-
-version: "3.7"
 services:
 
   nginx:
-    environment:
-    - NGINX_DOCKER_PORT=8080
     env_file: .env
     image: nginx:latest
-    container_name: nginx_odoo
+    container_name: nginx
     restart: unless-stopped
     depends_on:
       - odoo14
     ports:
-      - "127.0.0.1:8080:80"
+      - 8080:80
     volumes:
-      - ./nginx/conf/odoo:/etc/nginx/conf.d/default.conf
+      - ./nginx/templates:/etc/nginx/templates
+      - web-root:/var/www/html
+    environment:
+      - NGINX_HOST=localhost:8080
     networks:
       - net1
       
@@ -35,32 +33,36 @@ services:
       - "127.0.0.1:5444:5432"
     networks:
       - net1
+    volumes:
+      - db_home:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_DB=odoo14
 
-  odoo13:
-    container_name: odoo13_app
+  odoo14:
+    container_name: odoo_replica1
     env_file: .env
-    environment: 
-      - PGDATABASE=odoo13
-    build: *odoo13-build
-    image: odoogap/odoo13
+    build: *odoo-build
+    image: odoogap/odoo14
     restart: unless-stopped
     volumes:
-      - odoo13_home:/opt/odoo/
+      - odoo14_home:/var/lib/odoo
+      - ~/git/oe/14.0/:/mnt/oe
     depends_on:
       - db
     networks:
       - net1
 
-  odoo14:
-    container_name: odoo14_app
+  odoo14_2:
+    container_name: odoo_replica2
     env_file: .env
-    environment: 
-      - PGDATABASE=odoo14
-    build: *odoo14-build
+    build: *odoo-build
     image: odoogap/odoo14
     restart: unless-stopped
     volumes:
-      - odoo14_home:/opt/odoo/
+      - odoo14_home:/var/lib/odoo
+      - ~/git/oe/14.0/:/mnt/oe
     depends_on:
       - db
     networks:
@@ -69,9 +71,9 @@ services:
 volumes:
   db_home:
     external: false
-  odoo13_home:
-    external: false
   odoo14_home:
+    external: false
+  web-root:
     external: false
 
 networks:
