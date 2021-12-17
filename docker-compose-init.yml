@@ -1,0 +1,52 @@
+version: "3.7"
+
+x-odoo-build: &odoo-build
+  context: ./14.0
+  dockerfile: Dockerfile
+
+
+services:
+
+  odoo_init:
+    container_name: odoo_init
+    command: ["odoo", "--no-http", "--max-cron-threads", "0", "--stop-after-init", "-i", "session_redis"]
+    env_file: .env
+    build: *odoo-build
+    image: odoogap/odoo14
+    restart: "no"
+    volumes:
+      - odoo_home:/var/lib/odoo
+      - odoo_extra:/mnt/extra-addons
+      - ~/git/oe/14.0/:/mnt/oe
+    depends_on:
+      - db
+    networks:
+      - net1
+
+  db:
+    env_file: .env
+    image: postgres:12
+    container_name: db
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5444:5432"
+    networks:
+      - net1
+    volumes:
+      - db_home:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_DB=odoo14
+
+volumes:
+  db_home:
+    external: false
+  odoo_home:
+    external: false
+  odoo_extra:
+    external: False
+
+networks:
+  net1:
+    name: net1

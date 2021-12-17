@@ -4,8 +4,16 @@ x-odoo-build: &odoo-build
   context: ./14.0
   dockerfile: Dockerfile
 
-
 services:
+
+  redis:
+    container_name: redis
+    image: library/redis:5.0-alpine
+    restart: unless-stopped
+    networks:
+      - net1
+    volumes:
+      - redis_data:/data
 
   nginx:
     env_file: .env
@@ -13,14 +21,13 @@ services:
     container_name: nginx
     restart: unless-stopped
     depends_on:
-      - odoo14
+      - odoo1
+      - odoo2
     ports:
-      - 8080:80
+      - ${TEST_DOCKER_PORT}:80
     volumes:
       - ./nginx/templates:/etc/nginx/templates
-      - web-root:/var/www/html
-    environment:
-      - NGINX_HOST=localhost:8080
+      - web_root:/var/www/html
     networks:
       - net1
       
@@ -40,28 +47,46 @@ services:
       - POSTGRES_PASSWORD=odoo
       - POSTGRES_DB=odoo14
 
-  odoo14:
+  odoo1:
     container_name: odoo_replica1
     env_file: .env
     build: *odoo-build
     image: odoogap/odoo14
     restart: unless-stopped
     volumes:
-      - odoo14_home:/var/lib/odoo
+      - odoo_home:/var/lib/odoo
+      - odoo_extra:/mnt/extra-addons
       - ~/git/oe/14.0/:/mnt/oe
     depends_on:
       - db
     networks:
       - net1
 
-  odoo14_2:
+  odoo2:
     container_name: odoo_replica2
     env_file: .env
     build: *odoo-build
     image: odoogap/odoo14
     restart: unless-stopped
     volumes:
-      - odoo14_home:/var/lib/odoo
+      - odoo_home:/var/lib/odoo
+      - odoo_extra:/mnt/extra-addons
+      - ~/git/oe/14.0/:/mnt/oe
+    depends_on:
+      - db
+    networks:
+      - net1
+
+  odoo_cron:
+    container_name: odoo_cron
+    command: ["odoo", "--no-http", "--max-cron-threads", "2"]
+    env_file: .env
+    build: *odoo-build
+    image: odoogap/odoo14
+    restart: unless-stopped
+    volumes:
+      - odoo_home:/var/lib/odoo
+      - odoo_extra:/mnt/extra-addons
       - ~/git/oe/14.0/:/mnt/oe
     depends_on:
       - db
@@ -71,9 +96,13 @@ services:
 volumes:
   db_home:
     external: false
-  odoo14_home:
+  odoo_home:
     external: false
-  web-root:
+  odoo_extra:
+    external: False
+  web_root:
+    external: false
+  redis_data:
     external: false
 
 networks:
