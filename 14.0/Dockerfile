@@ -20,6 +20,8 @@ RUN chown -R odoo /mnt/oe \
     && chown -R odoo /mnt/extra-addons \
     && chown -R odoo /etc/odoogap/
 
+VOLUME ["/var/lib/odoo", "/mnt/extra-addons"]
+
 USER odoo
 
 

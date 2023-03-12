@@ -1,5 +1,0 @@
-#!/bin/bash
-# wait for init container to stop
-docker wait odoo_init
-# start instances
-docker-compose -f docker-compose.yml up -d --build --remove-orphans

@@ -55,7 +55,7 @@ services:
     restart: unless-stopped
     volumes:
       - odoo_home:/var/lib/odoo
-      - odoo_extra:/mnt/extra-addons
+      - ./14.0/mnt/:/mnt/extra-addons
       - ~/git/oe/14.0/:/mnt/oe
     depends_on:
       - db
@@ -70,7 +70,7 @@ services:
     restart: unless-stopped
     volumes:
       - odoo_home:/var/lib/odoo
-      - odoo_extra:/mnt/extra-addons
+      - ./14.0/mnt/:/mnt/extra-addons
       - ~/git/oe/14.0/:/mnt/oe
     depends_on:
       - db
@@ -86,7 +86,7 @@ services:
     restart: unless-stopped
     volumes:
       - odoo_home:/var/lib/odoo
-      - odoo_extra:/mnt/extra-addons
+      - ./14.0/mnt/:/mnt/extra-addons
       - ~/git/oe/14.0/:/mnt/oe
     depends_on:
       - db
