@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-odoo-build: &odoo-build
-  context: ./14.0
+  context: ./16.0
   dockerfile: Dockerfile
 
 services:
@@ -33,7 +33,7 @@ services:
       
   db:
     env_file: .env
-    image: postgres:12
+    image: postgres:14
     container_name: db
     restart: unless-stopped
     ports:
@@ -45,18 +45,19 @@ services:
     environment:
       - POSTGRES_USER=odoo
       - POSTGRES_PASSWORD=odoo
-      - POSTGRES_DB=odoo14
+      - POSTGRES_DB=odoo
 
   odoo1:
     container_name: odoo_replica1
     env_file: .env
     build: *odoo-build
-    image: odoogap/odoo14
+    image: erpgap/odoo16
     restart: unless-stopped
+    command: ["/startup.sh"]
     volumes:
       - odoo_home:/var/lib/odoo
-      - ./14.0/mnt/:/mnt/extra-addons
-      - ~/git/oe/14.0/:/mnt/oe
+      - odoo_extra:/mnt/extra-addons
+      - ./16.0/odoo.conf:/etc/odoo/odoo.conf
     depends_on:
       - db
     networks:
@@ -66,12 +67,13 @@ services:
     container_name: odoo_replica2
     env_file: .env
     build: *odoo-build
-    image: odoogap/odoo14
+    image: erpgap/odoo16
     restart: unless-stopped
+    command: ["/startup.sh"]
     volumes:
       - odoo_home:/var/lib/odoo
-      - ./14.0/mnt/:/mnt/extra-addons
-      - ~/git/oe/14.0/:/mnt/oe
+      - odoo_extra:/mnt/extra-addons
+      - ./16.0/odoo.conf:/etc/odoo/odoo.conf
     depends_on:
       - db
     networks:
@@ -82,12 +84,12 @@ services:
     command: ["odoo", "--no-http", "--max-cron-threads", "2"]
     env_file: .env
     build: *odoo-build
-    image: odoogap/odoo14
+    image: odoogap/odoo16
     restart: unless-stopped
     volumes:
       - odoo_home:/var/lib/odoo
-      - ./14.0/mnt/:/mnt/extra-addons
-      - ~/git/oe/14.0/:/mnt/oe
+      - odoo_extra:/mnt/extra-addons
+      - ./16.0/odoo.conf:/etc/odoo/odoo.conf
     depends_on:
       - db
     networks:

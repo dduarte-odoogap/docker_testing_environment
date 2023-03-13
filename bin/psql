@@ -1,9 +1,0 @@
-#!/bin/bash
-# Usage:
-#   ./bin/psql "-c \"select id, login from res_users \""
-docker exec -i db bash -c "psql -U odoo odoo14 $@"
-
-# Example for password reset
-# docker exec -i db /bin/bash <<EOF
-# psql -U odoo odoo14 -c "UPDATE res_users SET password=$1;"
-# EOF

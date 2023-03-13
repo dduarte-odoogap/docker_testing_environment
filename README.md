@@ -15,7 +15,9 @@ That is not a problem since the image is used for both and this way the file has
 ### Initializing the instance
 
 ```bash
-$> ./init
+$> docker-compose -f docker-compose-init.yml up --build -d
+# after initialization do CTRL-C then:
+$> docker-compose -f docker-compose.yml up --build -d
 ```
 
 ### Updating modules

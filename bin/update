@@ -1,9 +1,0 @@
-#!/bin/bash
-# rebuild
-docker-compose -f docker-compose.yml up --no-deps -d
-# stop web because of possible db locks
-docker-compose stop odoo1 odoo2
-# run update
-docker exec -i odoo_cron odoo --no-http --max-cron-threads 0 --stop-after-init -u all
-# restart everything again
-docker-compose restart

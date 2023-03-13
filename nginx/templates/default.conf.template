@@ -27,7 +27,12 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header X-Real-IP $remote_addr;
 
-    location ~* ^/([^/]+/static/|web/(css|js)/|web/image|web/content|website/image/) {
+#    location /static-enterprise {
+#        internal;
+#        alias /mnt/;
+#    }
+
+    location ~* ^/(web/(css|js)/|web/image|web/content|website/image/) {
         proxy_cache_valid 200 60m;
         proxy_buffering on;
         expires 30d;
@@ -35,7 +40,7 @@ server {
         proxy_pass http://odoo;
     }
 
-    location /longpolling {
+    location /websocket {
         proxy_set_header Host $host:$server_port;
         proxy_pass http://long;
     }
